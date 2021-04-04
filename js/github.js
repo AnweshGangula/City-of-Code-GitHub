@@ -1,6 +1,6 @@
 // GRAPHQL (GitHub API v4 and after)
 // Reference:  https://stackoverflow.com/a/59042992/6908282
-console.log(process.env.GITHUB_GRAPHQL_URL)
+console.log(site.GITHUB_GRAPHQL_URL)
 const tokenAG = process.env.GH_TOKEN
 // secure (apparently not entirely secure) above token using secrets in GH-Pages https://stackoverflow.com/questions/53648652/how-to-use-environment-variables-in-github-page
 const username = "AnweshGangula"
