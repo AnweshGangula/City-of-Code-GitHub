@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Build
+      env:
+        REACT_APP_APIKey: ${{ secrets.GH_TOKEN }}
