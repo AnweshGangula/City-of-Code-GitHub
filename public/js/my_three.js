@@ -1,3 +1,23 @@
+import ghData from './github.js'
+
+const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions
+const username = ghData.data.user.name
+const boxHeight = TotalContr / 100
+
+const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar
+let boxData = [];
+let [x, y] = [0, 0]
+contrCalender.weeks.forEach(week => {
+    let arr = []
+    week.contributionDays.forEach(day => {
+        arr.push({ "Count": day.contributionCount, "x": x, "y": y })
+        y++
+    });
+    boxData.push(arr)
+    x++
+    y = 0
+});
+
 let scene, camera, renderer, cube, cylinder, circle, text_mesh
 function init() {
     scene = new THREE.Scene();
@@ -26,7 +46,7 @@ function init() {
 
         var text_material = new THREE.MeshNormalMaterial();
 
-        let fMesh = getTextMesh("Anwesh Gangula", text_material, font)
+        let fMesh = getTextMesh(username, text_material, font)
         fMesh.position.x = 0;
         fMesh.position.y = 0.25;
         fMesh.position.z = 0.01;
@@ -43,6 +63,23 @@ function geometry() {
     const boxMat = new THREE.MeshNormalMaterial();
     cube = new THREE.Mesh(box, boxMat);
     scene.add(cube);
+
+    cube.position.y = boxHeight / 2
+
+    boxData.forEach(week => {
+        week.forEach(box => {
+            if (box.Count == 0) { return }
+
+            const boxgh = new THREE.BoxGeometry(1, box.Count, 1)
+            const boxghMat = new THREE.MeshNormalMaterial();
+            let cubegh = new THREE.Mesh(boxgh, boxghMat);
+            scene.add(cubegh);
+
+            cubegh.position.y = box.Count / 2;
+            cubegh.position.x = box.x;
+            cubegh.position.z = box.y;
+        });
+    });
 }
 
 function lights() {
