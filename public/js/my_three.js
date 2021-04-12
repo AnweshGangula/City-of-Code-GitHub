@@ -106,6 +106,14 @@ function calenderGeometry() {
     });
     console.log(calenderGeom);
     calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
+    calenderGeom.scale.set(1, 0, 1)
+
+    new TWEEN.Tween(calenderGeom.scale).to({
+        // x: 1,
+        y: 1
+        // z: 1
+    }, 1000)
+        .easing(TWEEN.Easing.Back.Out).start();
 
     scene.add(calenderGeom);
 }
@@ -125,7 +133,7 @@ function baseGeom() {
     baseGeometry.position.x = weekCount / 2;
     baseGeometry.position.y = -baseHeight / 2;
     baseGeometry.position.z = (dayCount / 2);
-    baseGeometry.scale.set(weekCount * 1.1, baseHeight, dayCount * 1.3);
+    baseGeometry.scale.set(weekCount * 1.05, baseHeight, dayCount * 1.3);
 
     scene.add(baseGeometry);
 
@@ -195,7 +203,7 @@ function render_scene() {
 }
 
 function animate() {
-
+    TWEEN.update();
 }
 
 function onWindowResize() {
