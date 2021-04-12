@@ -17,12 +17,18 @@ contrCalender.weeks.forEach(week => {
     x++;
     y = 0;
 });
+const weekCount = boxData.length;
+const dayCount = boxData[0].length;
 
 let scene,
     camera,
     renderer,
     cube,
     calenderGeom,
+    baseGeometry,
+    cylinder,
+    circle,
+    text_mesh,
     controls;
 function init() {
     scene = new THREE.Scene();
@@ -40,7 +46,9 @@ function init() {
     renderer.setSize(window.innerWidth * 0.95, window.innerHeight * 0.9);
     document.body.appendChild(renderer.domElement);
 
-    geometry();
+    calenderGeometry();
+    baseGeom();
+
     lights();
 
     //   calenderGeom.position.copy(intPosition.clone().add(new THREE.Vector3(0.5, 0.5, 0.5));
@@ -53,10 +61,20 @@ function init() {
 
     geomCenter.divideScalar(2);
 
+    var box = new THREE.Box3().setFromObject(calenderGeom);
+    var sizeX = box.getSize().x;
+    var sizeY = box.getSize().y;
+    var sizeZ = box.getSize().z;
+
+    var center = new THREE.Vector3();
+    // calenderGeom.computeBoundingBox();
+    box.getCenter(center);
+    // const geomCenter = box.getCenter 
+
     usernameGeom();
 
     let cameraPos = new THREE.Vector3();
-    cameraPos.addVectors(geomCenter, new THREE.Vector3(20, 20, 30));
+    cameraPos.addVectors(geomCenter, new THREE.Vector3(30, 20, 30));
     camera.position.copy(cameraPos);
 
     //   camera.lookAt has no effect when using OrbitControls: https://stackoverflow.com/a/45764133/6908282
@@ -67,13 +85,7 @@ function init() {
     controls.update();
 }
 
-function geometry() {
-    const box = new THREE.BoxGeometry(1, 1, 1);
-    const boxMat = new THREE.MeshNormalMaterial();
-    cube = new THREE.Mesh(box, boxMat);
-    scene.add(cube);
-
-    cube.position.y = boxHeight / 2;
+function calenderGeometry() {
     calenderGeom = new THREE.Group();
 
     boxData.forEach(week => {
@@ -92,7 +104,31 @@ function geometry() {
             cubegh.position.z = box.y;
         });
     });
+    console.log(calenderGeom);
+    calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
+
     scene.add(calenderGeom);
+}
+
+function baseGeom() {
+
+    let geometry = new THREE.CylinderGeometry(1 / Math.sqrt(2), 1.05 / Math.sqrt(2), 1, 4, 1); // size of top can be changed
+    const baseghMat = new THREE.MeshLambertMaterial();
+
+    geometry.rotateY(Math.PI / 4);
+    geometry = geometry.toNonIndexed(); // removes shared vertices
+    geometry.computeVertexNormals(); // normals will be 'flat' normals
+
+    baseGeometry = new THREE.Mesh(geometry, baseghMat);
+
+    const baseHeight = 2
+    baseGeometry.position.x = weekCount / 2;
+    baseGeometry.position.y = -baseHeight / 2;
+    baseGeometry.position.z = (dayCount / 2);
+    baseGeometry.scale.set(weekCount * 1.1, baseHeight, dayCount * 1.3);
+
+    scene.add(baseGeometry);
+
 }
 
 function usernameGeom() {
@@ -100,13 +136,19 @@ function usernameGeom() {
     loader.load(
         "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
         function (font) {
-            var text_material = new THREE.MeshNormalMaterial();
+            var text_material = new THREE.MeshToonMaterial();
+            text_material.color = new THREE.Color(0xff0000);
 
             let fMesh = getTextMesh("Anwesh Gangula", text_material, font);
-            fMesh.position.x = 0;
-            fMesh.position.y = 0.25;
-            fMesh.position.z = 0.01;
+            fMesh.position.x = weekCount / 2;
+            fMesh.position.y = -1;
+            fMesh.position.z = dayCount * 1.3;
+
+            fMesh.rotation.x = -Math.PI / 8;
+
+            fMesh.scale.set(10, 10, 20);
             scene.add(fMesh);
+
         }
     );
 }
@@ -153,13 +195,7 @@ function render_scene() {
 }
 
 function animate() {
-    // let height = cube.geometry.parameters.height;
-    if (cube.scale.y < 3) {
-        cube.scale.y += 0.01;
-        cube.position.y += 0.01 / 2;
-    }
-    // cylinder.rotation.x += 0.01;
-    cube.rotation.y += 0.001;
+
 }
 
 function onWindowResize() {
@@ -171,8 +207,7 @@ function onWindowResize() {
 window.addEventListener("resize", onWindowResize, false);
 
 document.body.onmousemove = function (e) {
-    cube.rotation.y = e.pageX / 500;
-    // cube.rotation.x = e.pageY / 100;
+
 };
 
 init();
