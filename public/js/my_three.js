@@ -108,12 +108,7 @@ function calenderGeometry() {
     calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
     calenderGeom.scale.set(1, 0, 1)
 
-    new TWEEN.Tween(calenderGeom.scale).to({
-        // x: 1,
-        y: 1
-        // z: 1
-    }, 1000)
-        .easing(TWEEN.Easing.Back.Out).start();
+    gsap.to(calenderGeom.scale, {duration: 2, y: 1, ease: "back.out(1.7)"})
 
     scene.add(calenderGeom);
 }
@@ -203,7 +198,7 @@ function render_scene() {
 }
 
 function animate() {
-    TWEEN.update();
+
 }
 
 function onWindowResize() {
