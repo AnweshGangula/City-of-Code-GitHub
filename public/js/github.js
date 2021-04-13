@@ -3,7 +3,7 @@
 const username = "AnweshGangula"
 
 async function getContributions() {
-  const response = await fetch(`/github/${username}`)
+  const response = await fetch(`/github?user=${username}`)
   const data = await response.json()
   return data;
 }

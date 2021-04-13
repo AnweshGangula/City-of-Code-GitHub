@@ -19,6 +19,7 @@ contrCalender.weeks.forEach(week => {
 });
 const weekCount = boxData.length;
 const dayCount = boxData[0].length;
+const stagger = 0.05;
 
 let scene,
     camera,
@@ -88,6 +89,7 @@ function init() {
 function calenderGeometry() {
     calenderGeom = new THREE.Group();
 
+    let i = 0;
     boxData.forEach(week => {
         week.forEach(box => {
             if (box.Count == 0) {
@@ -99,16 +101,18 @@ function calenderGeometry() {
             let cubegh = new THREE.Mesh(boxgh, boxghMat);
             calenderGeom.add(cubegh);
 
-            cubegh.position.y = box.Count / 2;
+            cubegh.position.y = -0.1;
             cubegh.position.x = box.x;
             cubegh.position.z = box.y;
+            cubegh.scale.y = 0;
+
+            gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "back.out(1.7)", delay: stagger * i })
+            gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
         });
+        i++;
     });
     console.log(calenderGeom);
     calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
-    calenderGeom.scale.set(1, 0, 1)
-
-    gsap.to(calenderGeom.scale, {duration: 2, y: 1, ease: "back.out(1.7)"})
 
     scene.add(calenderGeom);
 }

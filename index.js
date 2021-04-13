@@ -12,9 +12,9 @@ app.use(express.json({ limit: "1mb" }));
 //  Run Server side code and pass data to client: https://www.youtube.com/watch?v=ZtLVbJk7KcM&list=PLRqwX-V7Uu6YxDKpFzf_2D84p0cyk4T7X&index=17
 const tokenAG = process.env.GH_TOKEN;
 
-app.get('/github/:userid', async function (request, response) {
-    // console.log(request.params)
-    const usereid = request.params.userid
+app.get('/github', async function (request, response) {
+    // console.log(request.query)
+    const usereid = request.query.user
     const headers = {
         Authorization: `bearer ${tokenAG}`
     };
