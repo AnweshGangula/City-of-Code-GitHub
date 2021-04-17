@@ -20,6 +20,13 @@ contrCalender.weeks.forEach(week => {
     x++;
     y = 0;
 });
+const flatData = boxData.flat();
+let arrCount = [];
+flatData.forEach(key => {
+    arrCount.push(key.Count);
+})
+const maxContr = Math.max(...arrCount);
+// console.log(maxContr)
 const weekCount = boxData.length;
 const dayCount = boxData[0].length;
 const stagger = 0.05;
@@ -142,7 +149,7 @@ function cloudGeom() {
     for (let i = 0; i < 7; i++) {
         const c = new cloud();
         c.mesh.position.x = 7 * i + Math.random() * 10;
-        c.mesh.position.y = 15 + Math.random() * 5;
+        c.mesh.position.y = maxContr*0.8 + Math.random() * 5;
         c.mesh.position.z = Math.random() * 7;
         scene.add(c.mesh);
     }
