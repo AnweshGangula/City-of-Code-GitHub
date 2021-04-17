@@ -34,9 +34,12 @@ const stagger = 0.05;
 // -------- Three.js Start ---------
 
 let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls;
+let Clouds = [];
 
 function init() {
     scene = new THREE.Scene();
+    // change scene background color: https://stackoverflow.com/a/16177178/6908282
+    // scene.background = new THREE.Color( 0xffffff );
     camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -45,11 +48,12 @@ function init() {
     );
     // camera.position.z = 2;
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setClearColor("#e5e5e5");
+    // Transparent background: https://stackoverflow.com/a/31636198/6908282
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor(0xffffff, 0);
 
     renderer.setSize(window.innerWidth * 0.95, window.innerHeight * 0.9);
-    document.body.appendChild(renderer.domElement);
+    document.getElementById("canvas").appendChild(renderer.domElement);
 
     calenderGeometry();
     baseGeom();
@@ -85,11 +89,13 @@ function init() {
     cameraPos.addVectors(geomCenter, new THREE.Vector3(30, 20, 30));
     camera.position.copy(cameraPos);
 
-    //   camera.lookAt has no effect when using OrbitControls: https://stackoverflow.com/a/45764133/6908282
-    // camera.lookAt(geomCenter);
+    let camLookat = new THREE.Vector3();
+    camLookat.addVectors(geomCenter,new THREE.Vector3(5, 10, 0))
+    // //   camera.lookAt has no effect when using OrbitControls: https://stackoverflow.com/a/45764133/6908282
+    // camera.lookAt(camLookat);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.target = geomCenter;
+    controls.target = camLookat;
     controls.update();
 }
 
@@ -149,10 +155,12 @@ function cloudGeom() {
     for (let i = 0; i < 7; i++) {
         const c = new cloud();
         c.mesh.position.x = 7 * i + Math.random() * 10;
-        c.mesh.position.y = maxContr*0.8 + Math.random() * 5;
+        c.mesh.position.y = maxContr * 0.8 + Math.random() * 5;
         c.mesh.position.z = Math.random() * 7;
         scene.add(c.mesh);
+        Clouds.push(c.mesh);
     }
+    // console.log(Clouds);
 }
 
 function usernameGeom() {
@@ -219,6 +227,21 @@ function render_scene() {
 }
 
 function animate() {
+
+    Clouds.forEach(cloud => {
+        let cloudRects = cloud.children
+        cloudRects.forEach(rect => {
+            rect.rotation.x += Math.random() * 0.01;
+        });
+        if (cloud.position.x <= 2) {
+            gsap.to(cloud.scale, { duration: 3, x: 0, y: 0, z: 0, ease: "back.out(1.7)" });
+            gsap.to(cloud.position, { duration: 1, x: 50, z: Math.random() * 7, ease: "back.out(1.7)", delay: 3 });
+        }
+        if (cloud.position.x >= 50) {
+            gsap.to(cloud.scale, { duration: 3, x: 1, y: 1, z: 1, ease: "back.out(1.7)" });
+        }
+        cloud.position.x -= cloudRects.length * 0.002;
+    })
 
 }
 

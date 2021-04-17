@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;700&display=swap");
+* {
+  font-family: Lato;
+}
+
+u{
+    text-decoration: none;
+}
+
+#canvas {
+    position: relative;
+    display: flex;
+    flex-flow: column;
+}
+
+#instructions {
+    position: absolute;
+    top: 5px;
+}
+
+#instructions li{
+    margin-bottom: 5px;
+}
