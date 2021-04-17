@@ -1,10 +1,14 @@
-const express = require("express");
-const fetch = require("node-fetch");
-require('dotenv').config();
+import express from "express";
+import fetch from "node-fetch";
+import dotenv from 'dotenv';
+dotenv.config();
+import open from 'open';
 
 const app = express();
-const server = app.listen(3000, () =>
-    console.log("Starting server at :" + server.address().port)
+const server = app.listen(3000, () => {
+  console.log("Starting server at :" + server.address().port);
+  open('http://localhost:3000/')
+}
 );
 app.use(express.static("public"));
 app.use(express.json({ limit: "1mb" }));
@@ -13,6 +17,7 @@ app.use(express.json({ limit: "1mb" }));
 const tokenAG = process.env.GH_TOKEN;
 
 app.get('/github', async function (request, response) {
+    // API query parameters: https://www.youtube.com/watch?v=xq34NS4S59o&list=PLpcSpRrAaOargYaCNYxZCiFIp9YTqEl-l&index=18&t=8m
     // console.log(request.query)
     const usereid = request.query.user
     const headers = {

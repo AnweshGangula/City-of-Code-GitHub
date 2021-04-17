@@ -8,6 +8,7 @@ async function getContributions() {
   return data;
 }
 
-const ghData = await getContributions()
+const ghData = await getContributions();
+// console.log(ghData)
 
 export default ghData;

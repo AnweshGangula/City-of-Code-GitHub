@@ -1,10 +1,12 @@
-import ghData from "./github.js";
+// import ghData from "./github.js";
+import * as data from './my GitHub contribution.js';
+const ghData = data.default;
+// console.log(ghData);
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
 const username = ghData.data.user.name;
-const boxHeight = TotalContr / 100;
-
 const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
+
 let boxData = [];
 let [x, y] = [0, 0];
 contrCalender.weeks.forEach(week => {
@@ -21,16 +23,10 @@ const weekCount = boxData.length;
 const dayCount = boxData[0].length;
 const stagger = 0.05;
 
-let scene,
-    camera,
-    renderer,
-    cube,
-    calenderGeom,
-    baseGeometry,
-    cylinder,
-    circle,
-    text_mesh,
-    controls;
+// -------- Three.js Start ---------
+
+let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls;
+
 function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(
@@ -62,15 +58,17 @@ function init() {
 
     geomCenter.divideScalar(2);
 
-    var box = new THREE.Box3().setFromObject(calenderGeom);
-    var sizeX = box.getSize().x;
-    var sizeY = box.getSize().y;
-    var sizeZ = box.getSize().z;
+    {   //another way to get center of geometry. But this doesn't consider if there's any missing geomemtry at the end.
+        var box = new THREE.Box3().setFromObject(calenderGeom);
+        var sizeX = box.getSize().x;
+        var sizeY = box.getSize().y;
+        var sizeZ = box.getSize().z;
 
-    var center = new THREE.Vector3();
-    // calenderGeom.computeBoundingBox();
-    box.getCenter(center);
-    // const geomCenter = box.getCenter 
+        var center = new THREE.Vector3();
+        // calenderGeom.computeBoundingBox();
+        box.getCenter(center);
+        // const geomCenter = box.getCenter 
+    }
 
     usernameGeom();
 
@@ -111,7 +109,7 @@ function calenderGeometry() {
         });
         i++;
     });
-    console.log(calenderGeom);
+    // console.log(calenderGeom);
     calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
 
     scene.add(calenderGeom);
@@ -146,7 +144,7 @@ function usernameGeom() {
             var text_material = new THREE.MeshToonMaterial();
             text_material.color = new THREE.Color(0xff0000);
 
-            let fMesh = getTextMesh("Anwesh Gangula", text_material, font);
+            let fMesh = getTextMesh(username, text_material, font);
             fMesh.position.x = weekCount / 2;
             fMesh.position.y = -1;
             fMesh.position.z = dayCount * 1.3;
