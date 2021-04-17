@@ -5,9 +5,10 @@ dotenv.config();
 import open from 'open';
 
 const app = express();
-const server = app.listen(3000, () => {
+const port = 3000;
+const server = app.listen(port, () => {
   console.log("Starting server at :" + server.address().port);
-  open('http://localhost:3000/')
+  open(`http://localhost:${port}`)
 }
 );
 app.use(express.static("public"));

@@ -1,4 +1,5 @@
 // import ghData from "./github.js";
+import cloud from "./cloud.js"
 import * as data from './my GitHub contribution.js';
 const ghData = data.default;
 // console.log(ghData);
@@ -71,6 +72,7 @@ function init() {
     }
 
     usernameGeom();
+    cloudGeom();
 
     let cameraPos = new THREE.Vector3();
     cameraPos.addVectors(geomCenter, new THREE.Vector3(30, 20, 30));
@@ -134,6 +136,16 @@ function baseGeom() {
 
     scene.add(baseGeometry);
 
+}
+
+function cloudGeom() {
+    for (let i = 0; i < 7; i++) {
+        const c = new cloud();
+        c.mesh.position.x = 7 * i + Math.random() * 10;
+        c.mesh.position.y = 15 + Math.random() * 5;
+        c.mesh.position.z = Math.random() * 7;
+        scene.add(c.mesh);
+    }
 }
 
 function usernameGeom() {
