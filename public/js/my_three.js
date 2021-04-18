@@ -72,11 +72,11 @@ function init() {
 
     {   //another way to get center of geometry. But this doesn't consider if there's any missing geomemtry at the end.
         var box = new THREE.Box3().setFromObject(calenderGeom);
-        var sizeX = box.getSize().x;
-        var sizeY = box.getSize().y;
-        var sizeZ = box.getSize().z;
-
         var center = new THREE.Vector3();
+        
+        var sizeX = box.getSize(center).x;
+        var sizeY = box.getSize(center).y;
+        var sizeZ = box.getSize(center).z;
         // calenderGeom.computeBoundingBox();
         box.getCenter(center);
         // const geomCenter = box.getCenter 
@@ -109,7 +109,10 @@ function calenderGeometry() {
                 return;
             }
 
-            const boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
+            let boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
+            // Move the center of box to bottom : http://learningthreejs.com/blog/2013/08/02/how-to-do-a-procedural-city-in-100lines#:~:text=geometry.applymatrix
+            // boxgh.faces.splice( 3, 1 );
+            boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, box.Count / 2, 0.5));
             const boxghMat = new THREE.MeshNormalMaterial();
             let cubegh = new THREE.Mesh(boxgh, boxghMat);
             calenderGeom.add(cubegh);
@@ -120,12 +123,14 @@ function calenderGeometry() {
             cubegh.scale.y = 0;
 
             gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "back.out(1.7)", delay: stagger * i })
-            gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
+            // // below position transform is not necessary now, since we used "boxgh.applymatrix" above
+            // gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
         });
         i++;
     });
     // console.log(calenderGeom);
-    calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
+    // // below position transform is not necessary now, since we used "boxgh.applymatrix" above
+    // calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
 
     scene.add(calenderGeom);
 }
@@ -212,8 +217,8 @@ function getTextMesh(text, material, font) {
     textgeometry.center();
     let Mesh = new THREE.Mesh(textgeometry, material);
     // wireframe
-    var edges = new THREE.EdgesGeometry(Mesh.geometry); // or WireframeGeometry
-    Mesh.add(edges);
+    // var edges = new THREE.EdgesGeometry(Mesh.geometry); // or WireframeGeometry
+    // Mesh.add(edges);
 
     return Mesh;
 }
