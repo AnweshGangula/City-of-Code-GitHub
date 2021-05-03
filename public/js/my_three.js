@@ -50,9 +50,9 @@ function init() {
 
     // Transparent background: https://stackoverflow.com/a/31636198/6908282
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setClearColor(0xffffff, 0);
+    renderer.setClearColor(0x000000, 0);
 
-    renderer.setSize(window.innerWidth * 0.95, window.innerHeight * 0.9);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("canvas").appendChild(renderer.domElement);
 
     calenderGeometry();
@@ -72,11 +72,11 @@ function init() {
 
     {   //another way to get center of geometry. But this doesn't consider if there's any missing geomemtry at the end.
         var box = new THREE.Box3().setFromObject(calenderGeom);
+        var sizeX = box.getSize().x;
+        var sizeY = box.getSize().y;
+        var sizeZ = box.getSize().z;
+
         var center = new THREE.Vector3();
-        
-        var sizeX = box.getSize(center).x;
-        var sizeY = box.getSize(center).y;
-        var sizeZ = box.getSize(center).z;
         // calenderGeom.computeBoundingBox();
         box.getCenter(center);
         // const geomCenter = box.getCenter 
@@ -90,7 +90,7 @@ function init() {
     camera.position.copy(cameraPos);
 
     let camLookat = new THREE.Vector3();
-    camLookat.addVectors(geomCenter,new THREE.Vector3(5, 10, 0))
+    camLookat.addVectors(geomCenter, new THREE.Vector3(5, 10, 0))
     // //   camera.lookAt has no effect when using OrbitControls: https://stackoverflow.com/a/45764133/6908282
     // camera.lookAt(camLookat);
 
@@ -101,6 +101,7 @@ function init() {
 
 function calenderGeometry() {
     calenderGeom = new THREE.Group();
+    calenderGeom.name = "calenderGeometry";
 
     let i = 0;
     boxData.forEach(week => {
@@ -109,27 +110,55 @@ function calenderGeometry() {
                 return;
             }
 
-            let boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
-            // Move the center of box to bottom : http://learningthreejs.com/blog/2013/08/02/how-to-do-a-procedural-city-in-100lines#:~:text=geometry.applymatrix
-            // boxgh.faces.splice( 3, 1 );
+            const boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
             boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, box.Count / 2, 0.5));
-            const boxghMat = new THREE.MeshNormalMaterial();
+            const boxghMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                flatShading: true,
+                transparent: true,
+                metalness: 0.2,
+                emissive: 0x000000,
+                opacity: 0.8
+            });
+
+
             let cubegh = new THREE.Mesh(boxgh, boxghMat);
+            cubegh.name = box.date;
+            cubegh.userData = { Count: box.Count }
             calenderGeom.add(cubegh);
+
+            //     // wireframe
+            //     const edges = new THREE.EdgesGeometry( cubegh.geometry );
+            //     const lineMaterial = new THREE.LineBasicMaterial( {
+            //     color: 0xff00ff,
+            //     transparent : true,
+            //     linewidth: 1,
+            //     opacity : 0.5,
+            //     linecap: 'round', //ignored by WebGLRenderer
+            //     linejoin:  'round' //ignored by WebGLRenderer
+            //   } );
+            //     let line = new THREE.LineSegments( edges, lineMaterial );
+            //     // line.material.depthTest = false;
+            //     line.position.x = - 4;
+            //     line.position.y = -0.1;
+            //     line.position.x = box.x;
+            //     line.position.z = box.y;
+            //     line.scale.y = 0;
+            //     calenderGeom.add( line );
+            //     gsap.to(line.scale, { duration: 2, y: 1, ease: "back.out(1.7)", delay: stagger * i});
 
             cubegh.position.y = -0.1;
             cubegh.position.x = box.x;
             cubegh.position.z = box.y;
             cubegh.scale.y = 0;
 
-            gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "back.out(1.7)", delay: stagger * i })
+            gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "expo.out(1.7)", delay: stagger * i + 1 });
             // // below position transform is not necessary now, since we used "boxgh.applymatrix" above
             // gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
         });
         i++;
     });
     // console.log(calenderGeom);
-    // // below position transform is not necessary now, since we used "boxgh.applymatrix" above
     // calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
 
     scene.add(calenderGeom);
@@ -138,7 +167,16 @@ function calenderGeometry() {
 function baseGeom() {
 
     let geometry = new THREE.CylinderGeometry(1 / Math.sqrt(2), 1.05 / Math.sqrt(2), 1, 4, 1); // size of top can be changed
-    const baseghMat = new THREE.MeshLambertMaterial();
+    const baseghMat = new THREE.MeshStandardMaterial({
+        color: 0xb5b5b5,
+        // flatShading : true,
+        // transparent: true,
+        metalness: 0.2,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.05,
+        roughness: 0.1
+        // opacity: 0.8
+    });
 
     geometry.rotateY(Math.PI / 4);
     geometry = geometry.toNonIndexed(); // removes shared vertices
@@ -192,12 +230,12 @@ function usernameGeom() {
 
 function lights() {
     const color = 0xffffff;
-    const intensity = 0.2;
+    const intensity = 0.6;
     const light = new THREE.PointLight(color, intensity, 500);
     light.position.set(10, 0, 25);
     scene.add(light);
 
-    const light2 = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+    const light2 = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
     scene.add(light2);
 }
 
@@ -253,7 +291,7 @@ function animate() {
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth * 0.95, window.innerHeight * 0.9);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 window.addEventListener("resize", onWindowResize, false);

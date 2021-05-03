@@ -3,21 +3,18 @@
   font-family: Lato;
 }
 
-u{
-    text-decoration: none;
-}
-
-#canvas {
-    position: relative;
-    display: flex;
-    flex-flow: column;
-}
-
-#instructions {
+#tooltip > p {
+    margin: 0;
+  }
+  
+  canvas {
     position: absolute;
-    top: 5px;
-}
-
-#instructions li{
-    margin-bottom: 5px;
-}
+    top:0px;
+  }
+  
+  #tooltip{
+    position: absolute; 
+    transition: 200ms;
+    opacity: 0;
+  }
+  
