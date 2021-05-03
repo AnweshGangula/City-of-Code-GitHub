@@ -13,7 +13,7 @@ let [x, y] = [0, 0];
 contrCalender.weeks.forEach(week => {
     let arr = [];
     week.contributionDays.forEach(day => {
-        arr.push({ Count: day.contributionCount, x: x, y: y });
+        arr.push({ Count: day.contributionCount, date: day.date, x: x, y: y });
         y++;
     });
     boxData.push(arr);
@@ -33,8 +33,9 @@ const stagger = 0.05;
 
 // -------- Three.js Start ---------
 
-let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls;
+let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint;
 let Clouds = [];
+const pointer = new THREE.Vector2();
 
 function init() {
     scene = new THREE.Scene();
@@ -54,6 +55,10 @@ function init() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("canvas").appendChild(renderer.domElement);
+
+    raycaster = new THREE.Raycaster();
+    document.addEventListener('mousemove', onPointerMove);
+    document.addEventListener('click', onClick);
 
     calenderGeometry();
     baseGeom();
@@ -97,6 +102,53 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target = camLookat;
     controls.update();
+
+    // console.log(scene);
+}
+
+function onPointerMove(event) {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    // find intersections
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(scene.children[0].children);
+
+    if (intersects.length > 0) {
+        if (INTERSECTED != intersects[0].object) {
+
+            if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+            INTERSECTED = intersects[0].object;
+            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+            INTERSECTED.material.emissive.setHex(0xff0000);
+            INTERSECTED.currOpacity = INTERSECTED.material.opacity;
+            // INTERSECTED.material.opacity = 1;
+            // console.log(intersects[ 0 ]);
+
+            // intersectedPoint = intersects[0].point
+            // controls.target = intersectedPoint ;
+        }
+    } else {
+        if (INTERSECTED) {
+            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+            // INTERSECTED.material.opacity = INTERSECTED.currOpacity;
+        };
+        INTERSECTED = null;
+    }
+    let tooltip = document.getElementById("tooltip");
+    if (INTERSECTED) {
+        tooltip.innerHTML = `<p><b>Date</b>: ${INTERSECTED.name}</p><p><b>Contribution Count</b>: ${INTERSECTED.userData.Count}</p>`;
+        tooltip.style.opacity = 1;
+        tooltip.style.left = event.clientX + "px";
+        tooltip.style.top = event.clientY - 45 + "px";
+    } else {
+        tooltip.style.opacity = 0;
+    }
+}
+
+function onClick(event) {
+
 }
 
 function calenderGeometry() {
