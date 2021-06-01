@@ -9,9 +9,11 @@ const Cloud = function () {
 
     // create a material; a simple white material will do the trick
     var mat = new THREE.MeshPhongMaterial({
-        color: 0xd8d0d1,
-        opacity: Math.random()*0.8,
+        color: 0x00a9b5,
+        // metalness: 0.2,
+        opacity: Math.random() * 0.5,
         transparent: true,
+        emissive: 0x000000
     });
 
     // duplicate the geometry a random number of times

@@ -1,5 +1,8 @@
 // import ghData from "./github.js";
 import cloud from "./cloud.js"
+
+// Toggle comment below to switch between GitHub API and static json data
+// import ghData from "./github.js";
 import * as data from './my GitHub contribution.js';
 const ghData = data.default;
 // console.log(ghData);
@@ -110,11 +113,15 @@ function onPointerMove(event) {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
+
     // find intersections
+
     raycaster.setFromCamera(pointer, camera);
+
     const intersects = raycaster.intersectObjects(scene.children[0].children);
 
     if (intersects.length > 0) {
+
         if (INTERSECTED != intersects[0].object) {
 
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
@@ -129,13 +136,20 @@ function onPointerMove(event) {
             // intersectedPoint = intersects[0].point
             // controls.target = intersectedPoint ;
         }
+
     } else {
+
         if (INTERSECTED) {
             INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
             // INTERSECTED.material.opacity = INTERSECTED.currOpacity;
+
         };
+
         INTERSECTED = null;
+
     }
+
+
     let tooltip = document.getElementById("tooltip");
     if (INTERSECTED) {
         tooltip.innerHTML = `<p><b>Date</b>: ${INTERSECTED.name}</p><p><b>Contribution Count</b>: ${INTERSECTED.userData.Count}</p>`;
@@ -145,6 +159,7 @@ function onPointerMove(event) {
     } else {
         tooltip.style.opacity = 0;
     }
+
 }
 
 function onClick(event) {
@@ -165,7 +180,7 @@ function calenderGeometry() {
             const boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
             boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, box.Count / 2, 0.5));
             const boxghMat = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
+                color: 0x00966a,
                 flatShading: true,
                 transparent: true,
                 metalness: 0.2,
@@ -179,25 +194,25 @@ function calenderGeometry() {
             cubegh.userData = { Count: box.Count }
             calenderGeom.add(cubegh);
 
-            //     // wireframe
-            //     const edges = new THREE.EdgesGeometry( cubegh.geometry );
-            //     const lineMaterial = new THREE.LineBasicMaterial( {
-            //     color: 0xff00ff,
-            //     transparent : true,
-            //     linewidth: 1,
-            //     opacity : 0.5,
-            //     linecap: 'round', //ignored by WebGLRenderer
-            //     linejoin:  'round' //ignored by WebGLRenderer
-            //   } );
-            //     let line = new THREE.LineSegments( edges, lineMaterial );
-            //     // line.material.depthTest = false;
-            //     line.position.x = - 4;
-            //     line.position.y = -0.1;
-            //     line.position.x = box.x;
-            //     line.position.z = box.y;
-            //     line.scale.y = 0;
-            //     calenderGeom.add( line );
-            //     gsap.to(line.scale, { duration: 2, y: 1, ease: "back.out(1.7)", delay: stagger * i});
+            //             // wireframe
+            //             const edges = new THREE.EdgesGeometry( cubegh.geometry );
+            //             const lineMaterial = new THREE.LineBasicMaterial( {
+            //             color: 0xff00ff,
+            //             transparent : true,
+            //             linewidth: 1,
+            //             opacity : 0.5,
+            //             linecap: 'round', //ignored by WebGLRenderer
+            //             linejoin:  'round' //ignored by WebGLRenderer
+            //           } );
+            //             let line = new THREE.LineSegments( edges, lineMaterial );
+            //             // line.material.depthTest = false;
+            //             line.position.x = - 4;
+            //             line.position.y = -0.1;
+            //             line.position.x = box.x;
+            //             line.position.z = box.y;
+            //             line.scale.y = 0;
+            //             calenderGeom.add( line );
+            //             gsap.to(line.scale, { duration: 2, y: 1, ease: "back.out(1.7)", delay: stagger * i});
 
             cubegh.position.y = -0.1;
             cubegh.position.x = box.x;
@@ -205,7 +220,7 @@ function calenderGeometry() {
             cubegh.scale.y = 0;
 
             gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "expo.out(1.7)", delay: stagger * i + 1 });
-            // // below position transform is not necessary now, since we used "boxgh.applymatrix" above
+
             // gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
         });
         i++;
@@ -282,12 +297,12 @@ function usernameGeom() {
 
 function lights() {
     const color = 0xffffff;
-    const intensity = 0.6;
+    const intensity = 0.9;
     const light = new THREE.PointLight(color, intensity, 500);
     light.position.set(10, 0, 25);
     scene.add(light);
 
-    const light2 = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+    const light2 = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.8);
     scene.add(light2);
 }
 
