@@ -12,6 +12,7 @@ const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar
 const username = ghData.data.user.name;
 
 let boxData = [];
+let maxContr
 
 function getCalenderData() {
     boxData = [];
@@ -27,15 +28,16 @@ function getCalenderData() {
         x++;
         y = 0;
     });
+
+    const flatData = boxData.flat();
+    const arrCount = [];
+    flatData.forEach(key => {
+        arrCount.push(key.Count);
+    })
+    maxContr = Math.max(...arrCount);
 }
 getCalenderData();
 
-const flatData = boxData.flat();
-let arrCount = [];
-flatData.forEach(key => {
-    arrCount.push(key.Count);
-})
-const maxContr = Math.max(...arrCount);
 // console.log(maxContr)
 const weekCount = boxData.length;
 const dayCount = boxData[0].length;
@@ -43,8 +45,7 @@ const stagger = 0.05;
 
 // -------- Three.js Start ---------
 
-let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint;
-let Clouds = [];
+let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint, Clouds;
 const pointer = new THREE.Vector2();
 
 function init() {
@@ -243,33 +244,14 @@ document.querySelector('#submit_button').addEventListener('click', Update_CalGeo
 async function Update_CalGeom() {
     // window.alert("ABC");
     scene.remove(calenderGeom);
+    scene.remove(Clouds)
     var user_input = document.getElementById('user_input').value
     ghData = await getContributions(user_input)
 
-    getCalenderData()
-    calenderGeometry()
+    getCalenderData();
+    calenderGeometry();
+    cloudGeom();
 
-    // var loader = new THREE.FontLoader();
-    // loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-
-    //     const text_geometry = new THREE.TextGeometry(user_input, {
-    //         font: font,
-    //         size: 0.2,
-    //         height: 0.01,
-    //         curveSegments: 2,
-    //         // bevelEnabled: true,
-    //         // bevelThickness: 0.01,
-    //         // bevelSize: 0.01,
-    //         // bevelOffset: 0,
-    //         // bevelSegments: 1
-    //     });
-    //     text_geometry.center();
-    //     var text_material = new THREE.MeshNormalMaterial();
-    //     text_mesh = new THREE.Mesh(text_geometry, text_material);
-    //     text_mesh.position.y = 0.25;
-    //     text_mesh.position.z = 0.01;
-    //     scene.add(text_mesh);
-    // });
 }
 
 function baseGeom() {
@@ -303,14 +285,17 @@ function baseGeom() {
 }
 
 function cloudGeom() {
+    Clouds = new THREE.Group();
+    Clouds.name = "cloudsGeometry";
     for (let i = 0; i < 7; i++) {
         const c = new cloud();
         c.mesh.position.x = 7 * i + Math.random() * 10;
         c.mesh.position.y = maxContr * 0.8 + Math.random() * 5;
         c.mesh.position.z = Math.random() * 7;
-        scene.add(c.mesh);
-        Clouds.push(c.mesh);
+        Clouds.add(c.mesh);
     }
+    scene.add(Clouds);
+    console.log(Clouds)
     // console.log(Clouds);
 }
 
@@ -379,7 +364,7 @@ function render_scene() {
 
 function animate() {
 
-    Clouds.forEach(cloud => {
+    Clouds.children.forEach(cloud => {
         let cloudRects = cloud.children
         cloudRects.forEach(rect => {
             rect.rotation.x += Math.random() * 0.01;
