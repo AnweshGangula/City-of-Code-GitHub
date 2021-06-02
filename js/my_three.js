@@ -11,12 +11,13 @@ async function loadGitHubData() {
     // reference: https://youtu.be/LHpxrAR8dHA?t=1276
     const response = await fetch('api/GitHub_Calendar?user=AnweshGangula');
     const retrievedData = await response.json();
-    ghData = retrievedData;
-    console.log(ghData.data.user.name)
+
+    return retrievedData
 }
 
 // Don't call loadGitHubData() to use sample data from './my GitHub contribution.js'
-loadGitHubData()
+ghData = await loadGitHubData();
+console.log(ghData)
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
 const username = ghData.data.user.name;
