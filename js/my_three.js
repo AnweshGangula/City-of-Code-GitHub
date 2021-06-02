@@ -4,8 +4,19 @@ import cloud from "./cloud.js"
 // Toggle comment below to switch between GitHub API and static json data
 // import ghData from "./github.js";
 import * as data from './my GitHub contribution.js';
-const ghData = data.default;
+let ghData = data.default;
 // console.log(ghData);
+
+async function loadGitHubData() {
+    // reference: https://youtu.be/LHpxrAR8dHA?t=1276
+    const response = await fetch('api/GitHub_Calendar?user=AnweshGangula');
+    const retrievedData = await response.json();
+    ghData = retrievedData;
+    console.log(ghData.data.user.name)
+}
+
+// Don't call loadGitHubData() to use sample data from './my GitHub contribution.js'
+loadGitHubData()
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
 const username = ghData.data.user.name;
