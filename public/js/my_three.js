@@ -2,27 +2,34 @@
 import cloud from "./cloud.js"
 
 // Toggle comment below to switch between GitHub API and static json data
-// import ghData from "./github.js";
-import * as data from './my GitHub contribution.js';
-const ghData = data.default;
+import getContributions from "./github.js";
+let ghData = await getContributions("AnweshGangula")
+// import * as data from './my GitHub contribution.js';
+// const ghData = data.default;
 // console.log(ghData);
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
 const username = ghData.data.user.name;
-const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
 
 let boxData = [];
-let [x, y] = [0, 0];
-contrCalender.weeks.forEach(week => {
-    let arr = [];
-    week.contributionDays.forEach(day => {
-        arr.push({ Count: day.contributionCount, date: day.date, x: x, y: y });
-        y++;
+
+function getCalenderData() {
+    boxData = [];
+    let [x, y] = [0, 0];
+    const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
+    contrCalender.weeks.forEach(week => {
+        let arr = [];
+        week.contributionDays.forEach(day => {
+            arr.push({ Count: day.contributionCount, date: day.date, x: x, y: y });
+            y++;
+        });
+        boxData.push(arr);
+        x++;
+        y = 0;
     });
-    boxData.push(arr);
-    x++;
-    y = 0;
-});
+}
+getCalenderData();
+
 const flatData = boxData.flat();
 let arrCount = [];
 flatData.forEach(key => {
@@ -229,6 +236,40 @@ function calenderGeometry() {
     // calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
 
     scene.add(calenderGeom);
+}
+
+document.querySelector('#submit_button').addEventListener('click', Update_CalGeom)
+
+async function Update_CalGeom() {
+    // window.alert("ABC");
+    scene.remove(calenderGeom);
+    var user_input = document.getElementById('user_input').value
+    ghData = await getContributions(user_input)
+
+    getCalenderData()
+    calenderGeometry()
+
+    // var loader = new THREE.FontLoader();
+    // loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+
+    //     const text_geometry = new THREE.TextGeometry(user_input, {
+    //         font: font,
+    //         size: 0.2,
+    //         height: 0.01,
+    //         curveSegments: 2,
+    //         // bevelEnabled: true,
+    //         // bevelThickness: 0.01,
+    //         // bevelSize: 0.01,
+    //         // bevelOffset: 0,
+    //         // bevelSegments: 1
+    //     });
+    //     text_geometry.center();
+    //     var text_material = new THREE.MeshNormalMaterial();
+    //     text_mesh = new THREE.Mesh(text_geometry, text_material);
+    //     text_mesh.position.y = 0.25;
+    //     text_mesh.position.z = 0.01;
+    //     scene.add(text_mesh);
+    // });
 }
 
 function baseGeom() {

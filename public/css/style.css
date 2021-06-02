@@ -4,17 +4,16 @@
 }
 
 #tooltip > p {
-    margin: 0;
-  }
-  
-  canvas {
+  margin: 0;
+}
+
+/* canvas {
     position: absolute;
     top:0px;
-  }
-  
-  #tooltip{
-    position: absolute; 
-    transition: 200ms;
-    opacity: 0;
-  }
-  
+  } */
+
+#tooltip {
+  position: absolute;
+  transition: 200ms;
+  opacity: 0;
+}
