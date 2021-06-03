@@ -2,45 +2,52 @@
 import cloud from "./cloud.js"
 
 // Toggle comment below to switch between GitHub API and static json data
-// import ghData from "./github.js";
 import * as data from './my GitHub contribution.js';
 let ghData = data.default;
 // console.log(ghData);
 
-async function loadGitHubData() {
+async function loadGitHubData(username) {
     // reference: https://youtu.be/LHpxrAR8dHA?t=1276
-    const response = await fetch('api/GitHub_Calendar?user=AnweshGangula');
+    const response = await fetch(`api/GitHub_Calendar?user=${username}`);
     const retrievedData = await response.json();
 
     return retrievedData
 }
 
 // Don't call loadGitHubData() to use sample data from './my GitHub contribution.js'
-ghData = await loadGitHubData();
+ghData = await loadGitHubData("AnweshGangula");
 console.log(ghData)
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
-const username = ghData.data.user.name;
-const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
+let ghUsername = ghData.data.user.name;
 
 let boxData = [];
-let [x, y] = [0, 0];
-contrCalender.weeks.forEach(week => {
-    let arr = [];
-    week.contributionDays.forEach(day => {
-        arr.push({ Count: day.contributionCount, date: day.date, x: x, y: y });
-        y++;
+let maxContr
+
+function getCalenderData() {
+    boxData = [];
+    let [x, y] = [0, 0];
+    const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
+    contrCalender.weeks.forEach(week => {
+        let arr = [];
+        week.contributionDays.forEach(day => {
+            arr.push({ Count: day.contributionCount, date: day.date, x: x, y: y });
+            y++;
+        });
+        boxData.push(arr);
+        x++;
+        y = 0;
     });
-    boxData.push(arr);
-    x++;
-    y = 0;
-});
-const flatData = boxData.flat();
-let arrCount = [];
-flatData.forEach(key => {
-    arrCount.push(key.Count);
-})
-const maxContr = Math.max(...arrCount);
+
+    const flatData = boxData.flat();
+    const arrCount = [];
+    flatData.forEach(key => {
+        arrCount.push(key.Count);
+    })
+    maxContr = Math.max(...arrCount);
+}
+getCalenderData();
+
 // console.log(maxContr)
 const weekCount = boxData.length;
 const dayCount = boxData[0].length;
@@ -48,8 +55,7 @@ const stagger = 0.05;
 
 // -------- Three.js Start ---------
 
-let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint;
-let Clouds = [];
+let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint, Clouds, usernameMesh;
 const pointer = new THREE.Vector2();
 
 function init() {
@@ -102,7 +108,7 @@ function init() {
         // const geomCenter = box.getCenter 
     }
 
-    usernameGeom();
+    usernameGeom(ghUsername);
     cloudGeom();
 
     let cameraPos = new THREE.Vector3();
@@ -274,18 +280,40 @@ function baseGeom() {
 }
 
 function cloudGeom() {
+    Clouds = new THREE.Group();
+    Clouds.name = "cloudsGeometry";
     for (let i = 0; i < 7; i++) {
         const c = new cloud();
         c.mesh.position.x = 7 * i + Math.random() * 10;
         c.mesh.position.y = maxContr * 0.8 + Math.random() * 5;
         c.mesh.position.z = Math.random() * 7;
-        scene.add(c.mesh);
-        Clouds.push(c.mesh);
+        Clouds.add(c.mesh);
     }
+    scene.add(Clouds);
+    console.log(Clouds)
     // console.log(Clouds);
+
+    animateClouds();
 }
 
-function usernameGeom() {
+function animateClouds() {
+    Clouds.children.forEach(cloud => {
+        let cloudRects = cloud.children
+        cloudRects.forEach(rect => {
+            rect.rotation.x += Math.random() * 0.01;
+        });
+        if (cloud.position.x <= 2) {
+            gsap.to(cloud.scale, { duration: 3, x: 0, y: 0, z: 0, ease: "back.out(1.7)" });
+            gsap.to(cloud.position, { duration: 1, x: 50, z: Math.random() * 7, ease: "back.out(1.7)", delay: 3 });
+        }
+        if (cloud.position.x >= 50) {
+            gsap.to(cloud.scale, { duration: 3, x: 1, y: 1, z: 1, ease: "back.out(1.7)" });
+        }
+        cloud.position.x -= cloudRects.length * 0.002;
+    })
+}
+
+function usernameGeom(username) {
     var loader = new THREE.FontLoader();
     loader.load(
         "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
@@ -293,15 +321,15 @@ function usernameGeom() {
             var text_material = new THREE.MeshToonMaterial();
             text_material.color = new THREE.Color(0xff0000);
 
-            let fMesh = getTextMesh(username, text_material, font);
-            fMesh.position.x = weekCount / 2;
-            fMesh.position.y = -1;
-            fMesh.position.z = dayCount * 1.3;
+            usernameMesh = getTextMesh(username, text_material, font);
+            usernameMesh.position.x = weekCount / 2;
+            usernameMesh.position.y = -1;
+            usernameMesh.position.z = dayCount * 1.3;
 
-            fMesh.rotation.x = -Math.PI / 8;
+            usernameMesh.rotation.x = -Math.PI / 8;
 
-            fMesh.scale.set(10, 10, 20);
-            scene.add(fMesh);
+            usernameMesh.scale.set(10, 10, 20);
+            scene.add(usernameMesh);
 
         }
     );
@@ -345,26 +373,6 @@ function render_scene() {
     renderer.render(scene, camera);
 
     //   camera.lookAt(calenderGeom.position);
-    animate();
-}
-
-function animate() {
-
-    Clouds.forEach(cloud => {
-        let cloudRects = cloud.children
-        cloudRects.forEach(rect => {
-            rect.rotation.x += Math.random() * 0.01;
-        });
-        if (cloud.position.x <= 2) {
-            gsap.to(cloud.scale, { duration: 3, x: 0, y: 0, z: 0, ease: "back.out(1.7)" });
-            gsap.to(cloud.position, { duration: 1, x: 50, z: Math.random() * 7, ease: "back.out(1.7)", delay: 3 });
-        }
-        if (cloud.position.x >= 50) {
-            gsap.to(cloud.scale, { duration: 3, x: 1, y: 1, z: 1, ease: "back.out(1.7)" });
-        }
-        cloud.position.x -= cloudRects.length * 0.002;
-    })
-
 }
 
 function onWindowResize() {
@@ -381,3 +389,20 @@ document.body.onmousemove = function (e) {
 
 init();
 render_scene();
+
+document.querySelector('#submit_button').addEventListener('click', Update_CalGeom)
+
+async function Update_CalGeom() {
+    // window.alert("ABC");
+    scene.remove(calenderGeom);
+    scene.remove(Clouds);
+    scene.remove(usernameMesh)
+    var user_input = document.getElementById('user_input').value
+    ghData = await loadGitHubData(user_input)
+
+    getCalenderData();
+    calenderGeometry();
+    cloudGeom();
+    usernameGeom(user_input)
+
+}
