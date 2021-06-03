@@ -19,12 +19,13 @@ ghData = await loadGitHubData("AnweshGangula");
 console.log(ghData)
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
-let ghUsername = ghData.data.user.name;
+let ghUsername;
 
 let boxData = [];
 let maxContr
 
 function getCalenderData() {
+    ghUsername = ghData.data.user.name;
     boxData = [];
     let [x, y] = [0, 0];
     const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
@@ -108,7 +109,7 @@ function init() {
         // const geomCenter = box.getCenter 
     }
 
-    usernameGeom(ghUsername);
+    usernameGeom();
     cloudGeom();
 
     let cameraPos = new THREE.Vector3();
@@ -313,7 +314,7 @@ function animateClouds() {
     })
 }
 
-function usernameGeom(username) {
+function usernameGeom() {
     var loader = new THREE.FontLoader();
     loader.load(
         "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
@@ -321,7 +322,7 @@ function usernameGeom(username) {
             var text_material = new THREE.MeshToonMaterial();
             text_material.color = new THREE.Color(0xff0000);
 
-            usernameMesh = getTextMesh(username, text_material, font);
+            usernameMesh = getTextMesh(ghUsername, text_material, font);
             usernameMesh.position.x = weekCount / 2;
             usernameMesh.position.y = -1;
             usernameMesh.position.z = dayCount * 1.3;
@@ -403,6 +404,6 @@ async function Update_CalGeom() {
     getCalenderData();
     calenderGeometry();
     cloudGeom();
-    usernameGeom(user_input)
+    usernameGeom()
 
 }
