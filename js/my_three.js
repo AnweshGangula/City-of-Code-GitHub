@@ -16,7 +16,6 @@ async function loadGitHubData(username) {
 
 // Don't call loadGitHubData() to use sample data from './my GitHub contribution.js'
 ghData = await loadGitHubData("AnweshGangula");
-console.log(ghData)
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
 let ghUsername;
@@ -291,10 +290,6 @@ function cloudGeom() {
         Clouds.add(c.mesh);
     }
     scene.add(Clouds);
-    console.log(Clouds)
-    // console.log(Clouds);
-
-    animateClouds();
 }
 
 function animateClouds() {
@@ -374,6 +369,7 @@ function render_scene() {
     renderer.render(scene, camera);
 
     //   camera.lookAt(calenderGeom.position);
+    animateClouds();
 }
 
 function onWindowResize() {

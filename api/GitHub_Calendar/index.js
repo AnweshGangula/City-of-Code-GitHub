@@ -42,10 +42,11 @@ module.exports = async function (context, req) {
     // // console.log(ghData.data.user.name)
     context.log(ghResponse);
     // response.json(ghData);
+    const responseMessage = usereid ? ghData : "Add a query parameter in the URL in following format '?user=<GitHub_Username>'"
 
     context.res = {
         // status: 200, /* Defaults to 200 */
-        body: ghData,
+        body: responseMessage,
         headers: {
             'Content-Type': 'application/json'
         }
