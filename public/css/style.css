@@ -3,14 +3,19 @@
   font-family: Lato;
 }
 
-#tooltip > p {
+body {
   margin: 0;
 }
 
-/* canvas {
-    position: absolute;
-    top:0px;
-  } */
+#root {
+  position: absolute;
+  top: 0px;
+  margin-left: 10px;
+}
+
+#tooltip > p {
+  margin: 0;
+}
 
 #tooltip {
   position: absolute;
