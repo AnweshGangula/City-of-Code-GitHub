@@ -2,19 +2,20 @@
 import cloud from "./cloud.js"
 
 // Toggle comment below to switch between GitHub API and static json data
-import getContributions from "./github.js";
-let ghData = await getContributions("AnweshGangula")
+import loadGitHubData from "./github.js";
+let ghData = await loadGitHubData("AnweshGangula")
 // import * as data from './my GitHub contribution.js';
 // const ghData = data.default;
 // console.log(ghData);
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
-const username = ghData.data.user.name;
+let ghUsername;
 
 let boxData = [];
 let maxContr
 
 function getCalenderData() {
+    ghUsername = ghData.data.user.name;
     boxData = [];
     let [x, y] = [0, 0];
     const contrCalender = ghData.data.user.contributionsCollection.contributionCalendar;
@@ -45,7 +46,7 @@ const stagger = 0.05;
 
 // -------- Three.js Start ---------
 
-let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint, Clouds;
+let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint, Clouds, usernameMesh;
 const pointer = new THREE.Vector2();
 
 function init() {
@@ -181,12 +182,12 @@ function calenderGeometry() {
     let i = 0;
     boxData.forEach(week => {
         week.forEach(box => {
-            if (box.Count == 0) {
-                return;
-            }
+            // if (box.Count == 0) {
+            //     return;
+            // }
 
-            const boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
-            boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, box.Count / 2, 0.5));
+            const boxgh = new THREE.BoxGeometry(0.9, 1, 0.9);
+            boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5));
             const boxghMat = new THREE.MeshStandardMaterial({
                 color: 0x00966a,
                 flatShading: true,
@@ -227,7 +228,7 @@ function calenderGeometry() {
             cubegh.position.z = box.y;
             cubegh.scale.y = 0;
 
-            gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "expo.out(1.7)", delay: stagger * i + 1 });
+            gsap.to(cubegh.scale, { duration: 2, y: box.Count, ease: "expo.out(1.7)", delay: stagger * i + 1 });
 
             // gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
         });
@@ -237,21 +238,6 @@ function calenderGeometry() {
     // calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
 
     scene.add(calenderGeom);
-}
-
-document.querySelector('#submit_button').addEventListener('click', Update_CalGeom)
-
-async function Update_CalGeom() {
-    // window.alert("ABC");
-    scene.remove(calenderGeom);
-    scene.remove(Clouds)
-    var user_input = document.getElementById('user_input').value
-    ghData = await getContributions(user_input)
-
-    getCalenderData();
-    calenderGeometry();
-    cloudGeom();
-
 }
 
 function baseGeom() {
@@ -290,13 +276,29 @@ function cloudGeom() {
     for (let i = 0; i < 7; i++) {
         const c = new cloud();
         c.mesh.position.x = 7 * i + Math.random() * 10;
-        c.mesh.position.y = maxContr * 0.8 + Math.random() * 5;
+        c.mesh.position.y = Math.random() * 5;
         c.mesh.position.z = Math.random() * 7;
         Clouds.add(c.mesh);
     }
+    gsap.to(Clouds.position, { duration: 2, y: maxContr * 0.8, ease: "back.out(1.7)" });
     scene.add(Clouds);
-    console.log(Clouds)
-    // console.log(Clouds);
+}
+
+function animateClouds() {
+    Clouds.children.forEach(cloud => {
+        let cloudRects = cloud.children
+        cloudRects.forEach(rect => {
+            rect.rotation.x += Math.random() * 0.01;
+        });
+        if (cloud.position.x <= 2) {
+            gsap.to(cloud.scale, { duration: 3, x: 0, y: 0, z: 0, ease: "back.out(1.7)" });
+            gsap.to(cloud.position, { duration: 1, x: 50, z: Math.random() * 7, ease: "back.out(1.7)", delay: 3 });
+        }
+        if (cloud.position.x >= 50) {
+            gsap.to(cloud.scale, { duration: 3, x: 1, y: 1, z: 1, ease: "back.out(1.7)" });
+        }
+        cloud.position.x -= cloudRects.length * 0.002;
+    })
 }
 
 function usernameGeom() {
@@ -307,15 +309,15 @@ function usernameGeom() {
             var text_material = new THREE.MeshToonMaterial();
             text_material.color = new THREE.Color(0xff0000);
 
-            let fMesh = getTextMesh(username, text_material, font);
-            fMesh.position.x = weekCount / 2;
-            fMesh.position.y = -1;
-            fMesh.position.z = dayCount * 1.3;
+            usernameMesh = getTextMesh(ghUsername, text_material, font);
+            usernameMesh.position.x = weekCount / 2;
+            usernameMesh.position.y = -1;
+            usernameMesh.position.z = dayCount * 1.3;
 
-            fMesh.rotation.x = -Math.PI / 8;
+            usernameMesh.rotation.x = -Math.PI / 8;
 
-            fMesh.scale.set(10, 10, 20);
-            scene.add(fMesh);
+            usernameMesh.scale.set(10, 10, 20);
+            scene.add(usernameMesh);
 
         }
     );
@@ -359,26 +361,7 @@ function render_scene() {
     renderer.render(scene, camera);
 
     //   camera.lookAt(calenderGeom.position);
-    animate();
-}
-
-function animate() {
-
-    Clouds.children.forEach(cloud => {
-        let cloudRects = cloud.children
-        cloudRects.forEach(rect => {
-            rect.rotation.x += Math.random() * 0.01;
-        });
-        if (cloud.position.x <= 2) {
-            gsap.to(cloud.scale, { duration: 3, x: 0, y: 0, z: 0, ease: "back.out(1.7)" });
-            gsap.to(cloud.position, { duration: 1, x: 50, z: Math.random() * 7, ease: "back.out(1.7)", delay: 3 });
-        }
-        if (cloud.position.x >= 50) {
-            gsap.to(cloud.scale, { duration: 3, x: 1, y: 1, z: 1, ease: "back.out(1.7)" });
-        }
-        cloud.position.x -= cloudRects.length * 0.002;
-    })
-
+    animateClouds();
 }
 
 function onWindowResize() {
@@ -395,3 +378,32 @@ document.body.onmousemove = function (e) {
 
 init();
 render_scene();
+
+document.querySelector('#submit_button').addEventListener('click', Update_CalGeom)
+
+async function Update_CalGeom() {
+    // window.alert("ABC");
+    // scene.remove(calenderGeom);
+    // scene.remove(Clouds);
+    scene.remove(usernameMesh)
+    var user_input = document.getElementById('user_input').value
+    ghData = await loadGitHubData(user_input)
+
+    getCalenderData();
+    // calenderGeometry();
+    gsap.to(Clouds.position, { duration: 2, y: maxContr * 0.8, ease: "back.out(1.7)" });
+    // cloudGeom();
+    usernameGeom()
+
+    let i = 0;
+    boxData.forEach(week => {
+        week.forEach(box => {
+            let boxGeom = calenderGeom.children[i]
+            gsap.to(boxGeom.scale, { duration: 2, y: box.Count, ease: "back.out(1.7)" });
+
+            i++
+        })
+
+    })
+
+}
