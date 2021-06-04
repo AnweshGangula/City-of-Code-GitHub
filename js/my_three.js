@@ -191,12 +191,12 @@ function calenderGeometry() {
     let i = 0;
     boxData.forEach(week => {
         week.forEach(box => {
-            if (box.Count == 0) {
-                return;
-            }
+            // if (box.Count == 0) {
+            //     return;
+            // }
 
-            const boxgh = new THREE.BoxGeometry(0.9, box.Count, 0.9);
-            boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, box.Count / 2, 0.5));
+            const boxgh = new THREE.BoxGeometry(0.9, 1, 0.9);
+            boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5));
             const boxghMat = new THREE.MeshStandardMaterial({
                 color: 0x00966a,
                 flatShading: true,
@@ -237,7 +237,7 @@ function calenderGeometry() {
             cubegh.position.z = box.y;
             cubegh.scale.y = 0;
 
-            gsap.to(cubegh.scale, { duration: 2, y: 1, ease: "expo.out(1.7)", delay: stagger * i + 1 });
+            gsap.to(cubegh.scale, { duration: 2, y: box.Count, ease: "expo.out(1.7)", delay: stagger * i + 1 });
 
             // gsap.to(cubegh.position, { duration: 2, y: box.Count / 2, ease: "back.out(1.7)", delay: stagger * i })
         });
@@ -285,10 +285,11 @@ function cloudGeom() {
     for (let i = 0; i < 7; i++) {
         const c = new cloud();
         c.mesh.position.x = 7 * i + Math.random() * 10;
-        c.mesh.position.y = maxContr * 0.8 + Math.random() * 5;
+        c.mesh.position.y = Math.random() * 5;
         c.mesh.position.z = Math.random() * 7;
         Clouds.add(c.mesh);
     }
+    gsap.to(Clouds.position, { duration: 2, y: maxContr * 0.8, ease: "back.out(1.7)" });
     scene.add(Clouds);
 }
 
@@ -391,15 +392,25 @@ document.querySelector('#submit_button').addEventListener('click', Update_CalGeo
 
 async function Update_CalGeom() {
     // window.alert("ABC");
-    scene.remove(calenderGeom);
-    scene.remove(Clouds);
+    // scene.remove(calenderGeom);
+    // scene.remove(Clouds);
     scene.remove(usernameMesh)
     var user_input = document.getElementById('user_input').value
     ghData = await loadGitHubData(user_input)
 
     getCalenderData();
-    calenderGeometry();
-    cloudGeom();
+    // calenderGeometry();
+    gsap.to(Clouds.position, { duration: 2, y: maxContr * 0.8, ease: "back.out(1.7)" });
+    // cloudGeom();
     usernameGeom()
 
+    let i = 0;
+    boxData.forEach(week => {
+        week.forEach(box => {
+            let boxGeom = calenderGeom.children[i]
+            gsap.to(boxGeom.scale, { duration: 2, y: box.Count, ease: "back.out(1.7)" });
+
+            i++
+        })
+    })
 }
