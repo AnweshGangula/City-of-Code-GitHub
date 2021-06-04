@@ -2,13 +2,13 @@
 import cloud from "./cloud.js"
 
 // Toggle comment below to switch between GitHub API and static json data
-import * as data from './my GitHub contribution.js';
+import * as data from './my_GitHub_contribution.js';
 let ghData = data.default;
 // console.log(ghData);
 
 async function loadGitHubData(username) {
     // reference: https://youtu.be/LHpxrAR8dHA?t=1276
-    const response = await fetch(`api/GitHub_Calendar?user=${username}`);
+    const response = await fetch(`/api/GitHub_Calendar?user=${username}`);
     const retrievedData = await response.json();
 
     return retrievedData
