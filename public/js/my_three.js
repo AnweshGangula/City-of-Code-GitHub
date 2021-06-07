@@ -3,9 +3,9 @@ import cloud from "./cloud.js"
 
 // Toggle comment below to switch between GitHub API and static json data
 import loadGitHubData from "./github.js";
-let ghData = await loadGitHubData("AnweshGangula")
-// import * as data from './my GitHub contribution.js';
-// const ghData = data.default;
+// let ghData = await loadGitHubData("AnweshGangula")
+import * as data from './my GitHub contribution.js';
+let ghData = data.default;
 // console.log(ghData);
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
@@ -119,8 +119,26 @@ function init() {
 }
 
 function onPointerMove(event) {
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    // get mouse position based on canvas position: https://stackoverflow.com/a/40106019/6908282
+    //  additonal reference: https://stackoverflow.com/questions/27961400/three-js-raycaster-with-dynamic-canvas-position
+    let canvasBounds = renderer.domElement.getBoundingClientRect();
+
+    let canvasMargin = renderer.domElement.offsetLeft;
+    // console.log(canvasMargin);
+
+    pointer.x = (((event.clientX - canvasBounds.left) / (canvasBounds.width - canvasBounds.left)) * 2 - 1);
+    pointer.y = - ((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
+
+    // let para = document.querySelector('p');
+    // let compStyles = window.getComputedStyle(renderer.domElement);
+    // console.log(compStyles)
+
+
+    // pointer.x = ((event.clientX - canvasBounds.left) / (canvasBounds.right - canvasBounds.left)) * 2 - 1;
+    // pointer.y = -((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
+    // pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    // pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
 
     // find intersections
