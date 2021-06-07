@@ -8,8 +8,8 @@ body {
 }
 
 #root {
-  /* position: absolute;
-  top: 0px; */
+  position: absolute;
+  top: 0px;
   margin-left: 10px;
 }
 
@@ -24,12 +24,12 @@ body {
 }
 
 #canvas {
-  max-width: 1200px;
+  /* max-width: 1200px; */
   /* margin: auto causes issue with threejs raycaster: 
   https://stackoverflow.com/questions/50657526/does-getboundingclientrect-width-and-height-includes-paddings-and-borders-of-e
   https://stackoverflow.com/questions/20977347/getting-absolute-width-of-margins-issue-with-margin-auto
    */
-  /* margin: auto; */
+  margin: auto;
 }
 
 canvas {

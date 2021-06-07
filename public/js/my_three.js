@@ -122,24 +122,11 @@ function onPointerMove(event) {
 
     // get mouse position based on canvas position: https://stackoverflow.com/a/40106019/6908282
     //  additonal reference: https://stackoverflow.com/questions/27961400/three-js-raycaster-with-dynamic-canvas-position
-    let canvasBounds = renderer.domElement.getBoundingClientRect();
+    let canvas = renderer.domElement;
 
-    let canvasMargin = renderer.domElement.offsetLeft;
-    // console.log(canvasMargin);
-
-    pointer.x = (((event.clientX - canvasBounds.left) / (canvasBounds.width - canvasBounds.left)) * 2 - 1);
-    pointer.y = - ((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
-
-    // let para = document.querySelector('p');
-    // let compStyles = window.getComputedStyle(renderer.domElement);
-    // console.log(compStyles)
-
-
-    // pointer.x = ((event.clientX - canvasBounds.left) / (canvasBounds.right - canvasBounds.left)) * 2 - 1;
-    // pointer.y = -((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
-    // pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    // pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
+    // mouse position including CSS margin: https://stackoverflow.com/a/13544277/6908282
+    pointer.x = ((event.clientX - canvas.offsetLeft) / canvas.clientWidth) * 2 - 1;
+    pointer.y = - ((event.clientY - canvas.offsetTop) / canvas.clientHeight) * 2 + 1;
 
     // find intersections
 
