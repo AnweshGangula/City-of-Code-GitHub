@@ -47,9 +47,13 @@ const stagger = 0.05;
 // -------- Three.js Start ---------
 
 let scene, camera, renderer, cube, calenderGeom, baseGeometry, cylinder, circle, text_mesh, controls, raycaster, INTERSECTED, intersectedPoint, Clouds, usernameMesh;
+let gui, boxghMat;
+gui = new dat.GUI();
+
 const pointer = new THREE.Vector2();
 
 function init() {
+
     scene = new THREE.Scene();
     // change scene background color: https://stackoverflow.com/a/16177178/6908282
     // scene.background = new THREE.Color( 0xffffff );
@@ -116,6 +120,22 @@ function init() {
     controls.update();
 
     // console.log(scene);
+
+    DatGUI();
+}
+
+function DatGUI() {
+
+    const minY = (maxContr * 0.8) - 2;
+    const maxY = (maxContr * 0.8) + 10;
+    let cloudGUI = gui.add(Clouds.position, 'y')
+        .min(minY)
+        .max(maxY)
+        .step(0.01)
+        .name("Clouds Elevation");
+
+    cloudGUI.setValue(maxContr * 0.8);
+
 }
 
 function onPointerMove(event) {
@@ -156,13 +176,9 @@ function onPointerMove(event) {
         if (INTERSECTED) {
             INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
             // INTERSECTED.material.opacity = INTERSECTED.currOpacity;
-
         };
-
         INTERSECTED = null;
-
     }
-
 
     let tooltip = document.getElementById("tooltip");
     if (INTERSECTED) {
@@ -184,24 +200,35 @@ function calenderGeometry() {
     calenderGeom = new THREE.Group();
     calenderGeom.name = "calenderGeometry";
 
+    let boxdefaultColor = {
+        color: 0x00966a
+    }
+    gui.addColor(boxdefaultColor, 'color')
+        .onChange(() => {
+
+            boxghMat.color.set(boxdefaultColor.color);
+            console.log(boxdefaultColor.color);
+        })
+        .name("Box Color");
+
+    const boxgh = new THREE.BoxGeometry(0.9, 1, 0.9);
+    boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5));
+
+    boxghMat = new THREE.MeshStandardMaterial({
+        color: boxdefaultColor.color,
+        flatShading: true,
+        transparent: true,
+        metalness: 0.2,
+        emissive: 0x000000,
+        opacity: 0.8
+    });
+
     let i = 0;
     boxData.forEach(week => {
         week.forEach(box => {
             // if (box.Count == 0) {
             //     return;
             // }
-
-            const boxgh = new THREE.BoxGeometry(0.9, 1, 0.9);
-            boxgh.applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5));
-            const boxghMat = new THREE.MeshStandardMaterial({
-                color: 0x00966a,
-                flatShading: true,
-                transparent: true,
-                metalness: 0.2,
-                emissive: 0x000000,
-                opacity: 0.8
-            });
-
 
             let cubegh = new THREE.Mesh(boxgh, boxghMat);
             cubegh.name = box.date;
@@ -239,10 +266,12 @@ function calenderGeometry() {
         });
         i++;
     });
+
     // console.log(calenderGeom);
     // calenderGeom.position.z = 0.5; //the box center is at 0,0,0. So moving the geometry to 1/2 to make the corner point at 0,0,0
 
     scene.add(calenderGeom);
+
 }
 
 function baseGeom() {
