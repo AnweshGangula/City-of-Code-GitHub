@@ -3,9 +3,9 @@ import cloud from "./cloud.js"
 
 // Toggle comment below to switch between GitHub API and static json data
 import getContributions from "./github.js";
-let ghData = await getContributions("AnweshGangula")
-// import * as data from './my GitHub contribution.js';
-// const ghData = data.default;
+// let ghData = await getContributions("AnweshGangula")
+import * as data from './my GitHub contribution.js';
+const ghData = data.default;
 // console.log(ghData);
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;

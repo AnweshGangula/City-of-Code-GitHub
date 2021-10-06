@@ -1,3 +1,6 @@
+#Custom ignore files:
+api/local.settings.json
+
 # Logs
 logs
 *.log
