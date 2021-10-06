@@ -14,8 +14,8 @@ async function loadGitHubData(username) {
     return retrievedData
 }
 
-// Don't call loadGitHubData() to use sample data from './my GitHub contribution.js'
-ghData = await loadGitHubData("AnweshGangula");
+// Don't call loadGitHubData() to use sample data as default from './my GitHub contribution.js'
+// ghData = await loadGitHubData("AnweshGangula");
 
 const TotalContr = ghData.data.user.contributionsCollection.contributionCalendar.totalContributions;
 let ghUsername;
@@ -394,9 +394,9 @@ async function Update_CalGeom() {
     // window.alert("ABC");
     // scene.remove(calenderGeom);
     // scene.remove(Clouds);
-    scene.remove(usernameMesh)
     var user_input = document.getElementById('user_input').value
     ghData = await loadGitHubData(user_input)
+    scene.remove(usernameMesh)
 
     getCalenderData();
     // calenderGeometry();
