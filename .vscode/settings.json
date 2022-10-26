@@ -4,5 +4,10 @@
     "azureFunctions.projectLanguage": "JavaScript",
     "azureFunctions.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.preDeployTask": "npm prune"
+    "azureFunctions.preDeployTask": "npm prune",
+    "liveServer.settings.proxy": {
+        "enable": false,
+        "baseUri": "/api",
+        "proxyUri": "http://127.0.0.1:7071/api"
+    }
 }
