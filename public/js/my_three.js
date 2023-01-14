@@ -1,3 +1,6 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js";
+
 // import ghData from "./github.js";
 import cloud from "./cloud.js"
 
@@ -110,7 +113,7 @@ function init() {
     // //   camera.lookAt has no effect when using OrbitControls: https://stackoverflow.com/a/45764133/6908282
     // camera.lookAt(camLookat);
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
     controls.target = camLookat;
     controls.update();
 
@@ -269,7 +272,7 @@ function baseGeom() {
     });
 
     geometry.rotateY(Math.PI / 4);
-    geometry = geometry.toNonIndexed(); // removes shared vertices
+    // geometry = geometry.toNonIndexed(); // removes shared vertices
     geometry.computeVertexNormals(); // normals will be 'flat' normals
 
     baseGeometry = new THREE.Mesh(geometry, baseghMat);
