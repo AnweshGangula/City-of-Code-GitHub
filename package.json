@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/AnweshGangula/City-of-Code-GitHub#readme",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "vite": "^4.0.4"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",

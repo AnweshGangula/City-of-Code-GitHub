@@ -1,3 +1,5 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
+
 // reference: https://tympanus.net/codrops/2016/04/26/the-aviator-animating-basic-3d-scene-threejs/
 const Cloud = function () {
     // Create an empty container that will hold the different parts of the cloud
